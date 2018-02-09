@@ -184,6 +184,48 @@ class Commit(github.GithubObject.CompletableGithubObject):
         )
         return github.CommitStatus.CommitStatus(self._requester, headers, data, completed=True)
 
+    def create_deployment(self, task=github.GithubObject.NotSet, auto_merge=github.GithubObject.NotSet, required_contexts=github.GithubObject.NotSet,
+                          payload=github.GithubObject.NotSet, environment=github.GithubObject.NotSet, description=github.GithubObject.NotSet,
+                          transient_environment=github.GithubObject.NotSet, production_environment=github.GithubObject.NotSet):
+        """
+        :calls: `POST /repos/:owner/:repo/deployments <http://developer.github.com/v3/repos/deployments>`_
+        :param task: string
+        :param auto_merge: boolean
+        :param required_contexts: [string]
+        :param payload: dict
+        :param environment: string
+        :param description: string
+        :param transient_environment: boolean
+        :param production_environment: boolean
+        :rtype: :class:`github.CommitStatus.CommitStatus`
+        """
+        post_parameters = {
+            "ref": self.sha
+        }
+        if task is not github.GithubObject.NotSet:
+            post_parameters["task"] = task
+        if auto_merge is not github.GithubObject.NotSet:
+            post_parameters["auto_merge"] = auto_merge
+        if required_contexts is not github.GithubObject.NotSet:
+            post_parameters["required_contexts"] = required_contexts
+        if payload is not github.GithubObject.NotSet:
+            post_parameters["payload"] = payload
+        if environment is not github.GithubObject.NotSet:
+            post_parameters["environment"] = environment
+        if description is not github.GithubObject.NotSet:
+            post_parameters["description"] = description
+        if transient_environment is not github.GithubObject.NotSet:
+            post_parameters["transient_environment"] = transient_environment
+        if production_environment is not github.GithubObject.NotSet:
+            post_parameters["production_environment"] = production_environment
+        headers, data = self._requester.requestJsonAndCheck(
+            "POST",
+            self._parentUrl(self._parentUrl(self.url)) + "/deployments",
+            input=post_parameters,
+            headers={'Accept': 'application/vnd.github.ant-man-preview+json'}
+        )
+        return github.Deployment.Deployment(self._requester, headers, data, completed=True)
+
     def get_comments(self):
         """
         :calls: `GET /repos/:owner/:repo/commits/:sha/comments <http://developer.github.com/v3/repos/comments>`_

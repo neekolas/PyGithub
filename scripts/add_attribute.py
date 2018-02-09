@@ -44,7 +44,7 @@ attributeDocType, attributeAssertType, attributeValue = types[attributeType]
 
 
 fileName = os.path.join("github", className + ".py")
-
+lines = []
 with open(fileName) as f:
     lines = list(f)
 
@@ -56,7 +56,10 @@ added = False
 
 isProperty = False
 while not added:
-    line = lines[i].rstrip()
+    if i < len(lines) - 1:
+        line = lines[i].rstrip()
+    else:
+        break
     i += 1
     if line == "    @property":
         isProperty = True
@@ -80,7 +83,10 @@ added = False
 
 inInit = False
 while not added:
-    line = lines[i].rstrip()
+    if i < len(lines) - 1:
+        line = lines[i].rstrip()
+    else:
+        break
     i += 1
     if line == "    def _initAttributes(self):":
         inInit = True
@@ -97,7 +103,10 @@ added = False
 
 inUse = False
 while not added:
-    line = lines[i].rstrip()
+    if i < len(lines) - 1:
+        line = lines[i].rstrip()
+    else:
+        break
     i += 1
     if line == "    def _useAttributes(self, attributes):":
         inUse = True
@@ -107,7 +116,8 @@ while not added:
                 attrName = line[12:-36]
             if not line or attrName > attributeName:
                 newLines.append("        if \"" + attributeName + "\" in attributes:  # pragma no branch")
-                newLines.append("            assert attributes[\"" + attributeName + "\"] is None or isinstance(attributes[\"" + attributeName + "\"], " + attributeAssertType + "), attributes[\"" + attributeName + "\"]")
+                newLines.append("            assert attributes[\"" + attributeName + "\"] is None or isinstance(attributes[\"" +
+                                attributeName + "\"], " + attributeAssertType + "), attributes[\"" + attributeName + "\"]")
                 newLines.append("            self._" + attributeName + " = " + attributeValue)
                 added = True
     newLines.append(line)
@@ -118,6 +128,6 @@ while i < len(lines):
     i += 1
     newLines.append(line)
 
-with open(fileName, "wb") as f:
+with open(fileName, "w") as f:
     for line in newLines:
         f.write(line + "\n")
